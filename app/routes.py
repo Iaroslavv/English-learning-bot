@@ -15,12 +15,16 @@ def signup():
     if form.validate_on_submit():
         flash("Your account has been successfully created!", "success")
         return redirect(url_for("main"))
-        
+       
     return render_template("signup.html", title="Sign up", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
+    if form.validate_on_submit():
+        return redirect(url_for("main"))
     return render_template("login.html", title="Sign up", form=form)
+
+
 
