@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+<div class="registration-form">
+    <form method="POST"> 
+        <div class="form-icon">
+            <span><i class="icon icon-user"></i></span>
+        </div>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name(class="form-control item", placeholder="Username") }}
+        </div>
+        <div class="form-group">
+            {{ form.email(class="form-control item", placeholder="Email") }}
+        </div>
+        <div class="form-group">
+            {% if form.password.errors %}
+            {{ form.password(class="form-control item is-invalid", placeholder="Password") }}
+            <div class="invalid-feedback">
+                {% for error in form.password.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.password(class="form-control item", placeholder="Password") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {% if form.confirm_password.errors %}
+            {{ form.confirm_password(class="form-control item is-invalid", placeholder="Confirm your password") }}
+            <div class="invalid-feedback">
+                {% for error in form.confirm_password.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.name(class="form-control item", placeholder="Confirm your password") }}
+            {% endif %}
+        </div>
+        <div class="form-group" id="create-account">
+            {{ form.submit(class="btn btn-block", style="color: white;") }}
+        </div>
+    </form>
+    <div class="border-bottom pt-0">
+        <small class="text-muted">
+            Already have an account? <a class="ml-2" href="{{ url_for('login') }}">Log in</a>
+        </small>
+    </div>
+{% endblock content %}
