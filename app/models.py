@@ -1,7 +1,13 @@
-from app import db
+from app import db, login_manager
+from flask_login import UserMixin
 
 
-class User(db.Model):
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+class User(db.Model, UserMixin):
     """User db model."""
 
     id = db.Column(db.Integer, primary_key=True)
@@ -23,3 +29,5 @@ class Words(db.Model):
     
     def __repr__(self):
         return f"AddWords('{self.word}')"
+
+# probably should add one more table to store the example exersises

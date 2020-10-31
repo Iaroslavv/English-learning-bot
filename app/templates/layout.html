@@ -35,7 +35,7 @@
           <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
               <li class="nav-item active">
-                <a class="nav-link" href="dashboard">Dashboard
+                <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard
                       <span class="sr-only">(current)</span>
                     </a>
               </li>
@@ -43,10 +43,18 @@
                 <a class="nav-link" href="#">About</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="login">Log in</a>
+                {% if current_user.is_authenticated %}
+                  <a class="nav-link" href="{{ url_for('account') }}">Account</a>
+                {% else %}
+                  <a class="nav-link" href="{{ url_for('login') }}">Log in</a>
+                {% endif %}
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="signup">Sign up</a>
+                {% if current_user.is_authenticated %}
+                  <a class="nav-link" href="{{ url_for('logout') }}">Log out</a>
+                {% else %}
+                <a class="nav-link" href="{{ url_for('signup') }}">Sign up</a>
+                {% endif %}
               </li>
             </ul>
           </div>
