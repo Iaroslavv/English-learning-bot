@@ -1,6 +1,6 @@
 from app import app, db, bcrypt, mail
 from flask import render_template, flash, redirect, url_for, request, current_app
-from app.forms import SignUpForm, LoginForm, RequestResetForm, ResetPasswordForm
+from app.forms import SignUpForm, LoginForm, RequestResetForm, ResetPasswordForm, UpdateAccountForm
 from app.models import User
 from flask_login import login_user, login_required, current_user, logout_user
 from flask_mail import Message
@@ -54,7 +54,8 @@ def logout():
 @app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
-    return render_template("account.html", title="Account")
+    image_file = current_user.img_file
+    return render_template("account.html", title="Account", image_file=image_file)
 
 
 def send_reset_email(user):
@@ -103,6 +104,28 @@ def reset_token(token):
         return redirect(url_for("login"))
     return render_template("reset_token.html", title="Reset Password", form=form)
   
+    image_file = current_user.img_file
+    return render_template("account.html", title="Account", image_file=image_file)
+    
+
+@app.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():        
+        current_user.name = form.name.data
+        current_user.email = form.email.data
+        current_user.telegram_info = form.telegram_info.data
+        db.session.commit()
+        flash("Your account has been updated!", "success")
+        return redirect(url_for("account"))
+    elif request.method == "GET":
+        form.name.data = current_user.name
+        form.email.data = current_user.email
+        form.telegram_info.data = current_user.telegram_info
+    image_file = current_user.img_file
+    return render_template("settings.html", title="Account", image_file=image_file, form=form)
+
 
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required

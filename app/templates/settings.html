@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="registration-form">
+    <form method="POST" enctype="multipart/form-data"> 
+            <img src="{{ image_file }}" alt="Admin" class="rounded-circle" width="150">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {% if form.name.errors %}
+            {{ form.name(class="form-control form-control-lg item is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.name.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.name(class="form-control form-control-lg item", placeholder="Username") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {% if form.email.errors %}
+            {{ form.email(class="form-control form-control-lg item is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.email.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.email(class="form-control form-control-lg item", placeholder="Email") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {% if form.telegram_info.errors %}
+            {{ form.telegram_info(class="form-control form-control-lg item is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.telegram.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ form.telegram_info(class="form-control form-control-lg item", placeholder="Telegram") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.picture(class="btn btn") }}
+            {% if form.picture.errors %}
+            {% for error in form.picture.errors %}
+            <span class="text-danger"> {{ error }}</span></br>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group" id="create-account">
+            {{ form.submit(class="btn btn-block", style="color: white;") }}
+        </div>
+    </form>
+{% endblock content %}
