@@ -19,31 +19,10 @@
                 {{ form.email(class="form-control form-control-lg item", placeholder="Email") }}
             {% endif %}
         </div>
-        <div class="form-group">
-            {% if form.password.errors %}
-            {{ form.password(class="form-control form-control-lg item is-invalid") }}
-            <div class="invalid-feedback">
-                {% for error in form.password.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% else %}
-                {{ form.password(class="form-control form-control-lg item", placeholder="Password") }}
-            {% endif %}
-            <div class="form-check">
-                <p>{{form.remember}} Remember Me</p>
-            </div>
-        </div>
         <div class="form-group" id="create-account">
             {{ form.submit(class="btn btn-block", style="color: white;") }}
         </div>
-        <small class="text-muted ml-2">
-            <a href="{{ url_for('reset_request') }} ">Forgot your password?</a>
-        </small>
     </form>
-    <div class="border-bottom pt-0">
-        <small class="text-muted">
-            Don't have an account? <a class="ml-2" href="{{ url_for('signup') }}">Sign up</a>
-        </small>
-    </div>
+</div>
+
 {% endblock content %}
