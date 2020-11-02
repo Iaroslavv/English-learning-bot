@@ -6,6 +6,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 from flask_mail import Message
 
 
+@app.route("/", methods=["GET", "POST"])
 @app.route("/main", methods=["GET", "POST"])
 def main():
     title = "Homepage"
