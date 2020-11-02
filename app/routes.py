@@ -42,7 +42,7 @@ def login():
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("main"))
         else:
-            flash("Login Unsuccessfull. Please check email and password.", 'danger')
+            flash("Login Unsuccessfull. Please check email and password.", "danger")
     return render_template("login.html", title="Sign up", form=form)
 
 
@@ -113,10 +113,13 @@ def reset_token(token):
 @login_required
 def settings():
     form = UpdateAccountForm()
-    if form.validate_on_submit():        
+    if form.validate_on_submit():       
         current_user.name = form.name.data
         current_user.email = form.email.data
         current_user.telegram_info = form.telegram_info.data
+        current_user.twitter = form.twitter.data
+        current_user.instagram = form.instagram.data
+        current_user.facebook = form.facebook.data
         db.session.commit()
         flash("Your account has been updated!", "success")
         return redirect(url_for("account"))
@@ -124,6 +127,9 @@ def settings():
         form.name.data = current_user.name
         form.email.data = current_user.email
         form.telegram_info.data = current_user.telegram_info
+        form.twitter.data = current_user.twitter
+        form.instagram.data = current_user.instagram
+        form.facebook.data = current_user.facebook
     image_file = current_user.img_file
     return render_template("settings.html", title="Account", image_file=image_file, form=form)
 
@@ -131,4 +137,5 @@ def settings():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    pass
+    flash("That is an invalid or expired token", "warning")
+    return render_template("dashboard.html")
