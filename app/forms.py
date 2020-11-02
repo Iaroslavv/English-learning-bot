@@ -59,6 +59,9 @@ class UpdateAccountForm(FlaskForm):
     email = EmailField("Email", validators=[DataRequired()])
     picture = FileField("Update Profile Picture", validators=[FileAllowed(["jpg", "png"])])
     telegram_info = StringField("Telegram", validators=[DataRequired()])
+    twitter = StringField("Twitter", validators=[DataRequired()])
+    facebook = StringField("Twitter", validators=[DataRequired()])
+    instagram = StringField("Twitter", validators=[DataRequired()])
     submit = SubmitField("Update")
     
     def validate_name(self, name):
