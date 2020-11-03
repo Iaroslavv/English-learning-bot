@@ -71,15 +71,15 @@ def settings():
         current_user.name = form.name.data
         current_user.email = form.email.data
         current_user.telegram_info = form.telegram_info.data
+        current_user.instagram = form.instagram.data
+        current_user.twitter = form.twitter.data
+        current_user.facebook = form.facebook.data
         db.session.commit()
         flash("Your account has been updated!", "success")
         return redirect(url_for("users.account"))
     elif request.method == "GET":
         form.name.data = current_user.name
         form.email.data = current_user.email
-        form.instagram.data = current_user.instagram
-        form.facebook.data = current_user.facebook
-        form.twitter.data = current_user.twitter
         form.telegram_info.data = current_user.telegram_info
     image_file = current_user.img_file
     return render_template("settings.html", title="Account", image_file=image_file, form=form)
