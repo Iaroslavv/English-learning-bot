@@ -13,3 +13,4 @@ MAIL_USE_TLS = False
 MAIL_USE_SSL = True
 MAIL_USERNAME = "iaroslavmusic@gmail.com"
 MAIL_PASSWORD = "yaroslavolga1972"
+TOKEN = "1286174748:AAEUM7BBZhl3ZyOfntfX38HbqmrzpO8Ks1g"

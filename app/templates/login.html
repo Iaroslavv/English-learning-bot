@@ -38,12 +38,12 @@
             {{ form.submit(class="btn btn-block", style="color: white;") }}
         </div>
         <small class="text-muted ml-2">
-            <a href="{{ url_for('reset_request') }} ">Forgot your password?</a>
+            <a href="{{ url_for('users.reset_request') }} ">Forgot your password?</a>
         </small>
     </form>
     <div class="border-bottom pt-0">
         <small class="text-muted">
-            Don't have an account? <a class="ml-2" href="{{ url_for('signup') }}">Sign up</a>
+            Don't have an account? <a class="ml-2" href="{{ url_for('users.signup') }}">Sign up</a>
         </small>
     </div>
 {% endblock content %}
