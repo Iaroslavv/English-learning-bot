@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
     img_file = db.Column(db.String(20), nullable=False, default="static/default.png")
     password = db.Column(db.String(60), nullable=False)
     words = db.relationship("Words", backref="author", lazy=True)
-    instagram = db.Column(db.String(30), nullable=False, default="Your intagram")
+    instagram = db.Column(db.String(30), nullable=False, default="Your instagram")
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")

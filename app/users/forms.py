@@ -60,8 +60,8 @@ class UpdateAccountForm(FlaskForm):
     picture = FileField("Update Profile Picture", validators=[FileAllowed(["jpg", "png"])])
     telegram_info = StringField("Telegram", validators=[DataRequired()])
     twitter = StringField("Twitter", validators=[DataRequired()])
-    facebook = StringField("Twitter", validators=[DataRequired()])
-    instagram = StringField("Twitter", validators=[DataRequired()])
+    facebook = StringField("Facebook", validators=[DataRequired()])
+    instagram = StringField("Instagram", validators=[DataRequired()])
     submit = SubmitField("Update")
     
     def validate_name(self, name):
@@ -74,4 +74,4 @@ class UpdateAccountForm(FlaskForm):
         if email.data != current_user.email:
             email = User.query.filter_by(email=email.data).first()
             if email:
-                raise ValidationError("The user with this email already exists!")                              
+                raise ValidationError("The user with this email already exists!")
