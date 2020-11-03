@@ -6,6 +6,15 @@
         <div class="form-icon">
             <span><i class="icon icon-user"></i></span>
         </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}" style="display: inline-block;" id="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
         {{ form.hidden_tag() }}
         <div class="form-group">
             {% if form.email.errors %}

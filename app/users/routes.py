@@ -52,7 +52,7 @@ def login():
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("users.main"))
         else:
-            flash("Login Unsuccessfull. Please check email and password.", 'danger')
+            flash("Login Unsuccessfull. Please check email and password.", "danger")
     return render_template("login.html", title="Sign up", form=form)
 
 
@@ -123,7 +123,7 @@ def reset_token(token):
   
     image_file = current_user.img_file
     return render_template("account.html", title="Account", image_file=image_file)
-
+    
 
 @users.route("/dashboard", methods=["GET", "POST"])
 @login_required
