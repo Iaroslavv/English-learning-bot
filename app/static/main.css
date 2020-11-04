@@ -6,7 +6,7 @@ html, body {
     -o-background-size: cover;
   }
 
-/* .center {
+.center {
   left: 0;
   line-height: 200px;
   margin-top: -100px;
@@ -14,7 +14,7 @@ html, body {
   text-align: center;
   top: 50%;
   width: 100%;
-} */
+}
 
 h3 {
   letter-spacing: 2px;
