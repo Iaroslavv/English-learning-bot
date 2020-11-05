@@ -54,7 +54,7 @@ class ResetPasswordForm(FlaskForm):
 
          
 class UpdateAccountForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired(),
+    name = StringField("Username", validators=[DataRequired(),
                                            Length(min=2, max=20)])
     email = EmailField("Email", validators=[DataRequired()])
     picture = FileField("Update Profile Picture", validators=[FileAllowed(["jpg", "png"])])

@@ -70,7 +70,6 @@
     <div class="bg"></div>
     <div class="container">
         <div class="main-body">
-        
               <!-- Breadcrumb -->
               <nav aria-label="breadcrumb" class="main-breadcrumb">
                 <ol class="breadcrumb">
@@ -138,6 +137,15 @@
                         </div>
                         <div class="col-sm-9 text-secondary">
                           {{ current_user.telegram_info }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <h6 class="mb-0">Access link to telegram bot</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                          <a href="https://t.me/train_eng_bot/start={{ current_user.access_link }}">Open telegram bot</a>
                         </div>
                       </div>
                     </form>

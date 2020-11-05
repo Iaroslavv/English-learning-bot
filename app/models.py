@@ -2,11 +2,16 @@ from app import db, login_manager
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
+from hashlib import sha256
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+def generate_access_link(name: str) -> str:
+    return sha256(f"{name}".encode()).hexdigest()
 
 
 class User(db.Model, UserMixin):
@@ -17,6 +22,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(60), unique=True, nullable=False)
     img_file = db.Column(db.String(20), nullable=False, default="static/default.png")
     password = db.Column(db.String(60), nullable=False)
+    access_link = db.Column(db.String(70), nullable=False, default=generate_access_link(name))
     words = db.relationship("Words", backref="author", lazy=True)
     instagram = db.Column(db.String(30), nullable=False, default="Your instagram")
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
@@ -26,9 +32,9 @@ class User(db.Model, UserMixin):
     def get_reset_token(self, expires_sec=1800):
         serial = Serializer(current_app.config["SECRET_KEY"], expires_sec)
         return serial.dumps({"user_id": self.id}).decode("utf-8")
-
+    
     @staticmethod
-    def verify_reset_token(token):
+    def verify_reset_token(token) -> str:
         serial = Serializer(current_app.config["SECRET_KEY"])
         try:
             user_id = serial.loads(token)["user_id"]
