@@ -11,7 +11,7 @@ BOT_URL = "https://api.telegram.org/bot{TOKEN}/setWebhook?url={NGROK_URI}/setweb
     NGROK_URI=NGROK_URI,
     )
 
-
+#  set webhook for telegram bot
 @web.route("/setweb", methods=["POST"])
 def webhook():
     if request.headers.get("content-type") == "application/json":
@@ -23,11 +23,24 @@ def webhook():
         abort(403)
 
 
-@bot.message_handler(commands=["start", "help"])
+@bot.message_handler(commands=["start"])
 def send_welcome(message):
-    bot.reply_to(message, "Hello")
+    chat_id = message.from_user.id
+
+    bot.send_message(chat_id,
+"""
+Welcome to 'StudyEnglish with Bot'!
+List of commands:
+/addwords - add words to learn
+/delwords - delete words from your vocabulary
+/startpractice - start your exercises
+/finish - finish and see the result
+""")
 
 
-
+@bot.message_handler(func=lambda m: True, content_types=["text"])
+def addwords(message):
+    chat_id = message.from_user.id
+    bot.send_message(chat_id, "No")
 
 
