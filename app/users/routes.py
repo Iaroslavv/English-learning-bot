@@ -10,7 +10,7 @@ from app.users.forms import (
 )
 from app.models import User
 from flask_login import login_user, login_required, current_user, logout_user
-
+from hashlib import sha256
 from app.users.utils import send_reset_email
 
 
@@ -20,6 +20,8 @@ users = Blueprint("users", __name__)
 @users.route("/main", methods=["GET", "POST"])
 def main():
     title = "Homepage"
+    if current_user.is_authenticated:
+        return render_template("layout.html", title=title)
     return render_template("layout.html", title=title)
 
 
@@ -60,14 +62,20 @@ def login():
 @login_required
 def account():
     image_file = current_user.img_file
-    return render_template("account.html", title="Account", image_file=image_file)
+    access_to_telebot = current_user.access_link
+    return render_template(
+        "account.html",
+        title="Account",
+        image_file=image_file,
+        access_to_telebot=access_to_telebot,
+        )
 
 
 @users.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
     form = UpdateAccountForm()
-    if form.validate_on_submit():       
+    if form.validate_on_submit():    
         current_user.name = form.name.data
         current_user.email = form.email.data
         current_user.telegram_info = form.telegram_info.data

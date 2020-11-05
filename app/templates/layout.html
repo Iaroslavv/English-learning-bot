@@ -72,12 +72,17 @@
   <section class="first">
     <div class="center">
       {% block content %}
+      {% if current_user.is_authenticated %}
+      <h3>Get a link to telegram bot in your account<br>
+          and start practising!
+      {% else %}
     <h3>If you want to improve your english skills, <br>
       this is the right place for you!
     </h3>
     <h4>Already have an account? Then go to <a href="login" style="color: rgb(3, 98, 187);">login page</a> <br>
       New here? Then <a href="signup" style="color: rgb(3, 98, 187);">sign up</a>
     </h4> 
+    {% endif %}
    {% endblock content %}
 </div>
   </section>
