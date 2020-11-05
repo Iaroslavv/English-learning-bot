@@ -11,4 +11,4 @@ MAIL_USE_SSL = True
 MAIL_USERNAME = "iaroslavmusic@gmail.com"
 MAIL_PASSWORD = "yaroslavolga1972"
 TOKEN = "1286174748:AAEUM7BBZhl3ZyOfntfX38HbqmrzpO8Ks1g"
-NGROK_URI = "https://4fc0e9d62531.ngrok.io"
+NGROK_URI = "https://789d1efd4c19.ngrok.io"
