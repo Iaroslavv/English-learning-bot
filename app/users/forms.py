@@ -5,6 +5,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from app.models import User
 from flask_login import current_user
+from wtforms.widgets import Input
 
 
 class SignUpForm(FlaskForm):
@@ -75,3 +76,12 @@ class UpdateAccountForm(FlaskForm):
             email = User.query.filter_by(email=email.data).first()
             if email:
                 raise ValidationError("The user with this email already exists!")
+
+
+class ButtonField(BooleanField):
+    widget = Input(input_type="Button")
+
+
+class ListWords(FlaskForm):
+    words = StringField(validators=[DataRequired()])
+    submit = ButtonField("Show")
