@@ -10,11 +10,19 @@ from app.users.forms import (
 )
 from app.models import User
 from flask_login import login_user, login_required, current_user, logout_user
-from hashlib import sha256
 from app.users.utils import send_reset_email
+from hashlib import sha256
 
 
 users = Blueprint("users", __name__)
+
+
+def generate_access_link(name: str) -> str:
+    return sha256(f"{name}".encode()).hexdigest()
+
+
+def find_user_by_access_link(access_link: str) -> str:
+    return User.query.filter_by(access_link=access_link).first()
 
 
 @users.route("/main", methods=["GET", "POST"])
@@ -32,7 +40,10 @@ def signup():
     form = SignUpForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-        user = User(name=form.name.data, email=form.email.data, password=hashed_password)
+        user = User(name=form.name.data,
+                    email=form.email.data,
+                    password=hashed_password,
+                    access_link=generate_access_link(form.name.data))
         db.session.add(user)
         db.session.commit()
 
