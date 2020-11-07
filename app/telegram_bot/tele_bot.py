@@ -34,7 +34,7 @@ def extract_unique_code(text):
     return text.split()[1] if len(text.split()) > 1 else None
 
 
-def check_if_unique_code_exists(unique_code):
+def check_if_unique_code_exists(unique_code) -> bool:
     code = User.query.filter_by(access_link=unique_code).first()
     if code:
         return True
@@ -42,15 +42,15 @@ def check_if_unique_code_exists(unique_code):
 
 
 # does a query to the db, retrieving the associated username
-def get_username_from_db(unique_code):
+def get_username_from_db(unique_code) -> str:
     username = find_user_by_access_link(unique_code)
     if username:
-        return "ABC" if check_if_unique_code_exists(unique_code) else None
+        return username.name if check_if_unique_code_exists(unique_code) else None
 
 
 # save the chat_id>username to the db
-def save_chat_id(chat_id, username):
-    save_chat = TbotChatId(chat_id=chat_id, author=username)
+def save_chat_id(chat_id):
+    save_chat = TbotChatId(user_chat_id=chat_id)
     db.session.add(save_chat)
     db.session.commit()
 
@@ -58,20 +58,16 @@ def save_chat_id(chat_id, username):
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
     unique_code = extract_unique_code(message.text)
-    print("UNIQUE CODE 1", unique_code)
-    print("MESSAGE", message.text.split())
     chat_id = message.from_user.id
-    print("UNIQUE CODE EXISTS", unique_code)
     if unique_code:
-        username = get_username_from_db(unique_code)
-        print("GET USERNAME!", username)
-        if username:
-            save_chat_id(message.chat.id, username)
-            reply = "Hello {0}, how are you?".format(username)
+        get_username = get_username_from_db(unique_code)
+        if get_username:
+            save_chat_id(chat_id)
+            reply = "Hello {0}, how are you?".format(get_username)
         else:
             reply = "I have no clue who you are"
     else:
-        reply = "Doesn't work!"
+        reply = "Oooops, something went wrong.."
     bot.send_message(chat_id, reply)
 
 
