@@ -15,6 +15,9 @@ BOT_URL = "https://api.telegram.org/bot{TOKEN}/setWebhook?url={NGROK_URI}/setweb
     NGROK_URI=NGROK_URI,
     )
 
+greeting = "Welcome to 'StudyEnglish with Bot'!"
+
+count_correct_answers = 0
 
 #  set webhook for telegram bot
 @web.route("/setweb", methods=["POST"])
@@ -51,6 +54,7 @@ def get_username_from_db(unique_code) -> str:
 # save the chat_id>username to the db
 def save_chat_id(chat_id):
     save_chat = TbotChatId(user_chat_id=chat_id)
+    print(save_chat)
     db.session.add(save_chat)
     db.session.commit()
 
@@ -63,20 +67,38 @@ def send_welcome(message):
         get_username = get_username_from_db(unique_code)
         if get_username:
             save_chat_id(chat_id)
-            reply = "Hello {0}, how are you?".format(get_username)
+            reply = "Hello {0}! {1} Do you want to pass English knowledge test? yes/no".format(
+                get_username,
+                greeting
+            )
+            bot.register_next_step_handler(reply, process_test)
         else:
-            reply = "I have no clue who you are"
+            no_id = "I have no clue who you are"
+            bot.send_message(chat_id, no_id)
     else:
-        reply = "Oooops, something went wrong.."
-    bot.send_message(chat_id, reply)
+        mistake = "Oooops, something went wrong.."
+        bot.send_message(chat_id, mistake)
 
 
+def process_test(message):
+    chat_id = message.from_user.id
+    print(chat_id)
+    text = message.text
+    if text == "Yes":
+        bot.register_next_step_handler(
+"""You will be given 50 questions in this format:
+Question:
+1. Answer
+2. Answer
+3. Answer
+Type in the number of the answer to go to the next question.
+""", process_test2)
+    else:
+        bot.send_message(chat_id, "Please, choose your level of English knowledge" )
 
-# user_dict = {}
-# list_answers = iter(["One more?", "Come on!", "Don't be afraid!", "Yeeaahhhh",
-#                 "Moooore", "Give me more words!", "It is never too late to learn new words!",
-#                 "I believe in you!", "I am tired.."])
 
+def process_test2(message):
+    pass
 
 # @bot.message_handler(commands=["start"])
 # def send_welcome(message):
