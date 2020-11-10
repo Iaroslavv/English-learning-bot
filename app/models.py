@@ -25,8 +25,6 @@ class User(db.Model, UserMixin):
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
 
-    # def __init__(self, user_chat):
-    #     self.user_chat = user_chat
 
     def get_reset_token(self, expires_sec=1800):
         serial = Serializer(current_app.config["SECRET_KEY"], expires_sec)
