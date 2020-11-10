@@ -3,7 +3,6 @@ from config.config import TOKEN, NGROK_URI
 from flask import Blueprint, request, abort
 from app import db
 from app.models import User, TbotChatId
-from flask_login import current_user
 from app.users.routes import find_user_by_access_link
 
 
@@ -18,6 +17,7 @@ BOT_URL = "https://api.telegram.org/bot{TOKEN}/setWebhook?url={NGROK_URI}/setweb
 greeting = "Welcome to 'StudyEnglish with Bot'!"
 
 count_correct_answers = 0
+
 
 #  set webhook for telegram bot
 @web.route("/setweb", methods=["POST"])
@@ -37,7 +37,7 @@ def extract_unique_code(text):
     return text.split()[1] if len(text.split()) > 1 else None
 
 
-def check_if_unique_code_exists(unique_code) -> bool:
+def check_if_unique_code_exists(unique_code: str) -> bool:
     code = User.query.filter_by(access_link=unique_code).first()
     if code:
         return True
@@ -45,7 +45,7 @@ def check_if_unique_code_exists(unique_code) -> bool:
 
 
 # does a query to the db, retrieving the associated username
-def get_username_from_db(unique_code) -> str:
+def get_username_from_db(unique_code: str) -> str:
     username = find_user_by_access_link(unique_code)
     if username:
         return username.name if check_if_unique_code_exists(unique_code) else None
@@ -53,10 +53,11 @@ def get_username_from_db(unique_code) -> str:
 
 # save the chat_id>username to the db
 def save_chat_id(chat_id):
-    save_chat = TbotChatId(user_chat_id=chat_id)
-    print(save_chat)
-    db.session.add(save_chat)
-    db.session.commit()
+    chat = TbotChatId(user_chat_id=chat_id)
+    db.session.add(chat)
+    User.user_chat = chat
+    user = User.query.first()
+    print("USER INFO", user)
 
 
 @bot.message_handler(commands=["start"])
@@ -64,6 +65,7 @@ def send_welcome(message):
     unique_code = extract_unique_code(message.text)
     chat_id = message.from_user.id
     if unique_code:
+        print("CHAT ID", chat_id)
         get_username = get_username_from_db(unique_code)
         if get_username:
             save_chat_id(chat_id)
@@ -71,7 +73,8 @@ def send_welcome(message):
                 get_username,
                 greeting
             )
-            bot.register_next_step_handler(reply, process_test)
+            mes = bot.send_message(chat_id, reply)
+            bot.register_next_step_handler(mes, process_test)
         else:
             no_id = "I have no clue who you are"
             bot.send_message(chat_id, no_id)
@@ -81,20 +84,24 @@ def send_welcome(message):
 
 
 def process_test(message):
-    chat_id = message.from_user.id
-    print(chat_id)
-    text = message.text
-    if text == "Yes":
-        bot.register_next_step_handler(
+    try:
+        chat_id = message.from_user.id
+        text = message.text
+        if text == "Yes" or text == "yes":
+            msg = bot.send_message(chat_id,
 """You will be given 50 questions in this format:
 Question:
 1. Answer
 2. Answer
 3. Answer
 Type in the number of the answer to go to the next question.
-""", process_test2)
-    else:
-        bot.send_message(chat_id, "Please, choose your level of English knowledge" )
+If you want to start now, type 'begin'
+""")
+            bot.register_next_step_handler(msg, process_test2)
+        elif text == "No" or "no":
+            bot.send_message(chat_id, "Please, choose your level of English knowledge")
+    except Exception:
+        bot.send_message(chat_id, "Oooops, smth went wrong..")
 
 
 def process_test2(message):

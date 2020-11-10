@@ -19,11 +19,14 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     access_link = db.Column(db.String(70), nullable=False)
     words = db.relationship("Words", backref="user", lazy=True)
-    user_chat = db.relationship("TbotChatId", uselist=False, backref="user")
+    user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
     instagram = db.Column(db.String(30), nullable=False, default="Your instagram")
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
+
+    # def __init__(self, user_chat):
+    #     self.user_chat = user_chat
 
     def get_reset_token(self, expires_sec=1800):
         serial = Serializer(current_app.config["SECRET_KEY"], expires_sec)
@@ -39,7 +42,7 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
     
     def __repr__(self):
-        return f"User('{self.name}', '{self.email}')"
+        return f"User('{self.name}', '{self.email}', '{self.user_chat}')"
 
 
 class Words(db.Model):
@@ -55,8 +58,10 @@ class Words(db.Model):
 
 class TbotChatId(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_chat_id = db.Column(db.Integer, nullable=False)
+    user_chat_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
+    
+    def __repr__(self):
+        return f"TbotChatId('{self.user_chat_id}')"
 
 # probably should add one more table to store the example exersises
