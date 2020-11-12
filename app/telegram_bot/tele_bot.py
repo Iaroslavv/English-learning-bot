@@ -1,22 +1,25 @@
 import telebot
-from config.config import TOKEN, NGROK_URI
+from config.config import TOKEN
 from flask import Blueprint, request, abort
 from app import db
 from app.models import User, TbotChatId
 from app.users.routes import find_user_by_access_link
+from telebot import types
 from app.telegram_bot.count_user_points import TestCounter
-# from app.telegram_bot.bot_menu import main_menu
+
 
 bot = telebot.TeleBot(TOKEN)
 web = Blueprint("Web", __name__)
-
-BOT_URL = "https://api.telegram.org/bot{TOKEN}/setWebhook?url={NGROK_URI}/setweb".format(
-    TOKEN=TOKEN,
-    NGROK_URI=NGROK_URI,
-    )
-
-greeting = "Welcome to 'StudyEnglish with Bot'!"
 count_correct_answers = TestCounter()
+
+commands =(
+"""
+/test - start a test
+/chooselevel - choose your level of English
+""")
+
+
+greeting = f"Welcome to 'StudyEnglish with Bot'! {commands}"
 
 
 #  set webhook for telegram bot
@@ -56,8 +59,7 @@ def save_chat_id(chat_id):
     chat = TbotChatId(user_chat_id=chat_id)
     db.session.add(chat)
     User.user_chat = chat
-    user = User.query.first()
-    print(user)
+    print(User.query.first())
 
 
 @bot.message_handler(commands=["start"])
@@ -66,7 +68,6 @@ def send_welcome(message):
     chat_id = message.from_user.id
     if unique_code:
         get_username = get_username_from_db(unique_code)
-        print(get_username)
         if get_username:
             save_chat_id(chat_id)
             reply = "Hello {0}! {1} Do you want to pass English knowledge test? yes/no".format(
@@ -81,6 +82,17 @@ def send_welcome(message):
     else:
         mistake = "Oooops, something went wrong.."
         bot.send_message(chat_id, mistake)
+
+
+@bot.message_handler(commands=["chooselevel"])
+def choose_level(message):
+    chat_id = message.from_user.id
+    markup = telebot.types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton(text='beginner', callback_data=1))
+    markup.add(types.InlineKeyboardButton(text='elementary', callback_data=2))
+    markup.add(types.InlineKeyboardButton(text='pre intermediate', callback_data=3))
+    bot.send_message(chat_id, text="Please, specify you English level knowledge",
+                     reply_markup=markup)
 
 
 def process_test(message):
@@ -100,16 +112,36 @@ If you want to start now, type 'begin'
 """)
             bot.register_next_step_handler(msg, process_test2)
         elif text == "No" or text == "no":
-            msg = bot.send_message(chat_id, "Please, \
-                             choose your level of English knowledge")
-            bot.register_next_step_handler(msg, process_test2)
+            chat_id = message.from_user.id
+            markup = telebot.types.InlineKeyboardMarkup()
+            markup.add(telebot.types.InlineKeyboardButton(text='beginner',
+                                                          callback_data=1))
+            markup.add(telebot.types.InlineKeyboardButton(text='elementary',
+                                                          callback_data=2))
+            markup.add(telebot.types.InlineKeyboardButton(text='pre intermediate',
+                                                          callback_data=3))
+            bot.send_message(chat_id, text="Please, specify you English level knowledge",
+                             reply_markup=markup)
     except Exception:
         bot.send_message(chat_id, "Oooops, smth went wrong..")
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def query_menu(call):
+    if call.data.lower() == "1":
+        msg = "beginnerrr"
+    elif call.data.lower() == "2":
+        msg = "elementaryy"
+    elif call.data.lower() == "3":
+        msg = "pre intermediatee"
+    bot.send_message(call.message.chat.id, msg)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
 
 
 def process_test2(message):
     try:
         chat_id = message.from_user.id
+        print("chat id from process test 2")
         text = message.text
         if text == "begin":
             msg = bot.send_message(chat_id,
@@ -120,6 +152,7 @@ How many people ____ in your family?
 3. are there
 4. is
 """) 
+            print("before sending message process test 2")
             bot.register_next_step_handler(msg, process_test3)
         else:
             msg = bot.send_message(chat_id, "Sorry? Type 'begin' to start the test")
@@ -131,6 +164,7 @@ How many people ____ in your family?
 def process_test3(message):
     try:
         chat_id = message.from_user.id
+        print("process test3 chat id", chat_id)
         answer = message.text
         if answer == "3":
             count_correct_answers.add_point(1)
@@ -141,7 +175,8 @@ What time is it? ____
 2. Ten minus the quarter
 3. A quarter past ten
 4. Fiften after ten o'clock
-""")    
+""")        
+            print("before sending mess in process_test 3")
             bot.register_next_step_handler(msg, process_test4)
         else:
             msg = bot.send_message(chat_id,
@@ -161,6 +196,7 @@ What time is it? ____
 def process_test4(message):
     try:
         chat_id = message.from_user.id
+        print("chat id test 4")
         answer = message.text
         if answer == "3":
             count_correct_answers.add_point(1)
