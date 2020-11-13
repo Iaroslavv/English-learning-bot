@@ -16,7 +16,7 @@ class TestCounter:
         if 10 < self.count <= 16:
             total = f"Your level is elementary. {self.count}/50 are correct! {self.level}"
         if 16 < self.count <= 25:
-            total = f"Your level is pre-intermediate.{ self.count}/50 are correct!{self.level}"
+            total = f"Your level is pre-intermediate.{self.count}/50 are correct!{self.level}"
         if 25 < self.count <= 34:
             total = f"Your level is itermediate. {self.count}/50 are correct! {self.level}"
         if 34 < self.count <= 43:

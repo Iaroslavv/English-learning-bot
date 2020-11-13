@@ -91,7 +91,7 @@ def choose_level(message):
     markup.add(types.InlineKeyboardButton(text='beginner', callback_data=1))
     markup.add(types.InlineKeyboardButton(text='elementary', callback_data=2))
     markup.add(types.InlineKeyboardButton(text='pre intermediate', callback_data=3))
-    bot.send_message(chat_id, text="Please, specify you English level knowledge",
+    bot.send_message(chat_id, text="Please, specify your English level knowledge",
                      reply_markup=markup)
 
 
@@ -113,29 +113,34 @@ If you want to start now, type 'begin'
             bot.register_next_step_handler(msg, process_test2)
         elif text == "No" or text == "no":
             chat_id = message.from_user.id
-            markup = telebot.types.InlineKeyboardMarkup()
-            markup.add(telebot.types.InlineKeyboardButton(text='beginner',
-                                                          callback_data=1))
-            markup.add(telebot.types.InlineKeyboardButton(text='elementary',
-                                                          callback_data=2))
-            markup.add(telebot.types.InlineKeyboardButton(text='pre intermediate',
-                                                          callback_data=3))
-            bot.send_message(chat_id, text="Please, specify you English level knowledge",
+            markup = types.InlineKeyboardMarkup()
+            markup.add(types.InlineKeyboardButton(text='Beginner', callback_data=1))
+            markup.add(types.InlineKeyboardButton(text='Elementary', callback_data=2))
+            markup.add(types.InlineKeyboardButton(text='Pre-intermediate',
+                                                  callback_data=3))
+            bot.send_message(chat_id, text="Please, specify your English level knowledge",
                              reply_markup=markup)
     except Exception:
         bot.send_message(chat_id, "Oooops, smth went wrong..")
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def query_menu(call):
-    if call.data.lower() == "1":
-        msg = "beginnerrr"
-    elif call.data.lower() == "2":
-        msg = "elementaryy"
-    elif call.data.lower() == "3":
-        msg = "pre intermediatee"
-    bot.send_message(call.message.chat.id, msg)
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+@bot.callback_query_handler(func=lambda query: query.data == "1")
+def process_callback_beginner(query):
+    print("PROCESS CALL BACK BEGINNER", query.data)
+    print("query,data", query)
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton(text='Reading', callback_data=4))
+    markup.add(types.InlineKeyboardButton(text='Reading + writing', callback_data=5))
+    print("PROCESS CALL BACK BEGINNER before sending")                                      
+    bot.send_message(query.message.chat.id, text="Please, select the fields you want to work on",
+                     reply_markup=markup)
+    print("PROCESS CALL BACK BEGINNER after sending")  
+    bot.edit_message_reply_markup(query.message.chat.id, query.message.message_id)
+    
+
+@bot.callback_query_handler(func=lambda query: query.data == "4")
+def process_callback_reading(query):
+    print("READING HERE")
 
 
 def process_test2(message):
