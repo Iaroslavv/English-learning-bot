@@ -80,7 +80,7 @@ def send_welcome(message):
             no_id = "I have no clue who you are"
             bot.send_message(chat_id, no_id)
     else:
-        mistake = "Oooops, something went wrong.."
+        mistake = "Sorry, but i accept messages from registered users only.."
         bot.send_message(chat_id, mistake)
 
 
