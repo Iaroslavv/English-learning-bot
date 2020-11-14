@@ -2,9 +2,8 @@ import telebot
 from config.config import TOKEN
 from flask import Blueprint, request, abort
 from app import db
-from app.models import User, TbotChatId
+from app.models import User, TbotChatId, NewWords
 from app.users.routes import find_user_by_access_link
-from telebot import types
 from app.telegram_bot.count_user_points import TestCounter
 
 
@@ -15,7 +14,11 @@ count_correct_answers = TestCounter()
 commands =(
 """
 /test - start a test
-/chooselevel - choose your level of English
+/addwords - add words to your vocabulary
+/getsynonym - Get synonyms for word
+/mywords
+/study - bot gives you a word and you must
+write the synonym for this word
 """)
 
 
@@ -59,7 +62,6 @@ def save_chat_id(chat_id):
     chat = TbotChatId(user_chat_id=chat_id)
     db.session.add(chat)
     User.user_chat = chat
-    print(User.query.first())
 
 
 @bot.message_handler(commands=["start"])
@@ -67,15 +69,16 @@ def send_welcome(message):
     unique_code = extract_unique_code(message.text)
     chat_id = message.from_user.id
     if unique_code:
+        print(unique_code)
         get_username = get_username_from_db(unique_code)
         if get_username:
             save_chat_id(chat_id)
-            reply = "Hello {0}! {1} Do you want to pass English knowledge test? yes/no".format(
+            reply = "Hello {0}! {1} Let's add some new words into your vocabulary! Just type in any word".format(
                 get_username,
                 greeting
             )
             mes = bot.send_message(chat_id, reply)
-            bot.register_next_step_handler(mes, process_test)
+            bot.register_next_step_handler(mes, gather_words)
         else:
             no_id = "I have no clue who you are"
             bot.send_message(chat_id, no_id)
@@ -84,15 +87,38 @@ def send_welcome(message):
         bot.send_message(chat_id, mistake)
 
 
-@bot.message_handler(commands=["chooselevel"])
-def choose_level(message):
+@bot.message_handler(commands=["addwords"])
+def add_words(message):
     chat_id = message.from_user.id
-    markup = telebot.types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(text='beginner', callback_data=1))
-    markup.add(types.InlineKeyboardButton(text='elementary', callback_data=2))
-    markup.add(types.InlineKeyboardButton(text='pre intermediate', callback_data=3))
-    bot.send_message(chat_id, text="Please, specify your English level knowledge",
-                     reply_markup=markup)
+    msg = bot.send_message(chat_id,
+           "Type in the word you want to add. Type in 'finish' to end adding words.")
+    print("before sendng msg in add words", chat_id)
+    bot.register_next_step_handler(msg, gather_words)
+    print("after sending msg in add words")
+
+
+def add_words_to_vocab(text):
+    print("USER before adding words", User.query.first())
+    word_to_db = NewWords(user_word=text)
+    User.words.append(word_to_db)
+    print("after appending")
+    print("User words", User.query.first())
+
+
+def gather_words(message):
+    try:
+        chat_id = message.from_user.id
+        text = message.text
+        print("text in gather words")
+        add_words_to_vocab(text)
+        print("After text in gather words", User.query.first())
+        print("text saved")
+        bot.register_next_step_handler("One more!", gather_words)
+        if text == "finish":
+            bot.send_message(chat_id, "Good! Now you can get a list of your words with /mywords command")
+    except Exception as e:
+        print(str(e))
+        bot.send_message(chat_id, "Ops, words havent been added..")
 
 
 def process_test(message):
@@ -113,40 +139,14 @@ If you want to start now, type 'begin'
             bot.register_next_step_handler(msg, process_test2)
         elif text == "No" or text == "no":
             chat_id = message.from_user.id
-            markup = types.InlineKeyboardMarkup()
-            markup.add(types.InlineKeyboardButton(text='Beginner', callback_data=1))
-            markup.add(types.InlineKeyboardButton(text='Elementary', callback_data=2))
-            markup.add(types.InlineKeyboardButton(text='Pre-intermediate',
-                                                  callback_data=3))
-            bot.send_message(chat_id, text="Please, specify your English level knowledge",
-                             reply_markup=markup)
+            bot.send_message(chat_id, text="Please, choose the appropriate command from the list")
     except Exception:
         bot.send_message(chat_id, "Oooops, smth went wrong..")
-
-
-@bot.callback_query_handler(func=lambda query: query.data == "1")
-def process_callback_beginner(query):
-    print("PROCESS CALL BACK BEGINNER", query.data)
-    print("query,data", query)
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(text='Reading', callback_data=4))
-    markup.add(types.InlineKeyboardButton(text='Reading + writing', callback_data=5))
-    print("PROCESS CALL BACK BEGINNER before sending")                                      
-    bot.send_message(query.message.chat.id, text="Please, select the fields you want to work on",
-                     reply_markup=markup)
-    print("PROCESS CALL BACK BEGINNER after sending")  
-    bot.edit_message_reply_markup(query.message.chat.id, query.message.message_id)
-    
-
-@bot.callback_query_handler(func=lambda query: query.data == "4")
-def process_callback_reading(query):
-    print("READING HERE")
 
 
 def process_test2(message):
     try:
         chat_id = message.from_user.id
-        print("chat id from process test 2")
         text = message.text
         if text == "begin":
             msg = bot.send_message(chat_id,
