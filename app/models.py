@@ -18,13 +18,12 @@ class User(db.Model, UserMixin):
     img_file = db.Column(db.String(20), nullable=False, default="static/default.png")
     password = db.Column(db.String(60), nullable=False)
     access_link = db.Column(db.String(70), nullable=False)
-    words = db.relationship("Words", backref="user", lazy=True)
+    words = db.relationship("NewWords", backref="user", lazy=True)
     user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
     instagram = db.Column(db.String(30), nullable=False, default="Your instagram")
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
-
 
     def get_reset_token(self, expires_sec=1800):
         serial = Serializer(current_app.config["SECRET_KEY"], expires_sec)
@@ -40,21 +39,23 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
     
     def __repr__(self):
-        return f"User('{self.name}', '{self.email}', '{self.user_chat}')"
+        return f"User('{self.name}', '{self.email}', '{self.user_chat}', '{self.words}')"
 
 
-class Words(db.Model):
+class NewWords(db.Model):
     """User's words db model."""
 
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(40), nullable=False)
+    user_word = db.Column(db.String(40))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
   
     def __repr__(self):
-        return f"Words('{self.word}')"
+        return f"Words('{self.user_word}')"
 
 
 class TbotChatId(db.Model):
+    """User's telegram chat id model."""
+
     id = db.Column(db.Integer, primary_key=True)
     user_chat_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

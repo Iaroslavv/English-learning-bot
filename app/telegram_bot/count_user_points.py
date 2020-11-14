@@ -1,6 +1,6 @@
 class TestCounter:
     """Count user's points from the testing."""
-    level = "Type in the command '/choose level'"
+    level = "Type in the command '/addwords'"
 
     def __init__(self, count=0, level=level):
         self.count = count
