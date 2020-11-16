@@ -11,7 +11,7 @@ bot = telebot.TeleBot(TOKEN)
 web = Blueprint("Web", __name__)
 count_correct_answers = TestCounter()
 
-commands =(
+commands = (
 """
 /test - start a test
 /addwords - add words to your vocabulary
@@ -90,11 +90,16 @@ def send_welcome(message):
         bot.send_message(chat_id, mistake)
 
 
+# @bot.message_handler(func=lambda message: True, content_types=['text'])
+# def command_default(m):
+#     bot.send_message(m.chat.id, "I don't understand \"" + m.text + "\"\nMaybe try the /help command?")
+
+
 @bot.message_handler(commands=["addwords"])
 def add_words(message):
     chat_id = message.from_user.id
     msg = bot.send_message(chat_id,
-           "Type in the word you want to add. Type in 'finish' to end adding words.")
+        "Type in the word you want to add. Type in 'finish' to stop adding words.")
     bot.register_next_step_handler(msg, gather_words)
 
 
@@ -108,22 +113,41 @@ def add_words_to_vocab(word, unique_code):
         db.session.commit()
 
 
-answers = iter["Come ooon", "Moooore words!", "One more!", "Don't be weak!", "One moore!!"]
+answers = iter(["Come ooon", "Moooore words!", "One more!", "Don't be weak!", "One moore!!"])
 
 
 def gather_words(message, unique_code):
     try:
         chat_id = message.from_user.id
         text = message.text
-        add_words_to_vocab(text, unique_code)
-        msg = bot.send_message(chat_id, next(answers))
-        bot.register_next_step_handler(msg, gather_words, unique_code)
         if text == "finish":
-            bot.send_message(chat_id, "Good! Now you can get a list of your words with /mywords command")
+            msg = bot.send_message(chat_id, "Here's your list of words:")
+            bot.register_next_step_handler_by_chat_id(chat_id, get_user_words, unique_code)
+        else:
+            add_words_to_vocab(text, unique_code)
+            msg = bot.send_message(chat_id, next(answers, "One more!"))
+            bot.register_next_step_handler(msg, gather_words, unique_code)
     except Exception as e:
         print(str(e))
         bot.send_message(chat_id, "Ops, words havent been added..")
 
+
+def get_user_words(message, unique_code):
+    try:
+        chat_id = message.from_user.id
+        get_username = get_username_from_db(unique_code)
+        if get_username:
+            print("get user words name", get_username)
+            user = User.query.filter_by(name=get_username).first()
+            words = NewWords.query.filter_by(person_id=user.id).all()
+            print("get user words words", words)
+            bot.send_message(chat_id, f"Your list of words: {words}")
+        else:
+            bot.send_message(chat_id, "Sorry, i cannot give you words")
+    except Exception as e:
+        print(str(e))
+        bot.send_message(chat_id, "There is an error..")
+    
 
 def process_test(message):
     try:
@@ -1608,6 +1632,5 @@ def show_test_result(message):
             bot.send_message(chat_id, count_correct_answers.show_total)
         else:
             bot.send_message(chat_id,count_correct_answers.show_total)
-            # bot.register_next_step_handler(msg, main_menu)
     except Exception:
         bot.send_message(chat_id, "Oooops, smth went wrong..")

@@ -62,5 +62,3 @@ class TbotChatId(db.Model):
     
     def __repr__(self):
         return f"TbotChatId('{self.user_chat_id}')"
-
-# probably should add one more table to store the example exersises
