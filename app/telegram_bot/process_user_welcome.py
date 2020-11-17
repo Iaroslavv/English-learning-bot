@@ -29,7 +29,6 @@ class ProcessWelcome:
     @staticmethod
     def save_chat_id(chat_id: int, unique_code: str):
         get_username = ProcessWelcome.get_username_from_db(unique_code)
-        print("save chat id", get_username)
         if get_username:
             user = User.query.filter_by(name=get_username).first()
             chat = TbotChatId(user_chat_id=chat_id)

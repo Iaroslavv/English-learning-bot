@@ -4,6 +4,7 @@ from flask import Blueprint, request, abort
 from app import db
 from app.models import User, NewWords
 from app.telegram_bot.process_user_welcome import ProcessWelcome
+from app.telegram_bot.synonyms import find_synonym
 
 
 bot = telebot.TeleBot(TOKEN)
@@ -12,10 +13,11 @@ web = Blueprint("Web", __name__)
 commands = (
 """
 /addwords - add words to your vocabulary
-/getsynonym - Get synonyms for word
-/mywords
+/getsynonyms - Get synonyms for words
+/mywords - get your words
 /study - bot gives you a word and you must write the synonym for this word.
-If the synonym you wrote is correct, you get one point.
+If the synonym you wrote is in the list of synonyms, you get one point.
+Type in 'stop' to see the results.
 The progress can be seen on your profile page on the website.
 Enjoy!
 """)
@@ -67,11 +69,11 @@ def send_welcome(message):
 def add_words(message):
     chat_id = message.from_user.id
     msg = bot.send_message(chat_id,
-        "Type in the word you want to add. Type in 'finish' to stop adding words.")
+    "Type in the word you want to add. Type in 'finish' to stop adding words and see the synonyms.")
     bot.register_next_step_handler(msg, gather_words)
 
 
-def add_words_to_vocab(word, unique_code):
+def add_words_to_vocab(word: str, unique_code: str):
     get_username = ProcessWelcome.get_username_from_db(unique_code)
     if get_username:
         user = User.query.filter_by(name=get_username).first()
@@ -84,7 +86,7 @@ def add_words_to_vocab(word, unique_code):
 answers = iter(["Come ooon", "Moooore words!", "One more!", "Don't be weak!", "One moore!!"])
 
 
-def gather_words(message, unique_code):
+def gather_words(message, unique_code: str):
     try:
         chat_id = message.from_user.id
         text = message.text
@@ -93,6 +95,9 @@ def gather_words(message, unique_code):
             if get_username:
                 user = User.query.filter_by(name=get_username).first()
                 words = NewWords.query.filter_by(person_id=user.id).all()
+                user_dict = {}
+                for word in words:
+                    user_dict[word] = find_synonym(word)
                 get_words = '\n'.join(str(word) for word in words)
                 bot.send_message(chat_id, f"Your list of words:\n{get_words}")
             else:
