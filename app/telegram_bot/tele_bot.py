@@ -121,8 +121,14 @@ def gather_words(message, unique_code):
         chat_id = message.from_user.id
         text = message.text
         if text == "finish":
-            msg = bot.send_message(chat_id, "Here's your list of words:")
-            bot.register_next_step_handler_by_chat_id(chat_id, get_user_words, unique_code)
+            get_username = get_username_from_db(unique_code)
+            if get_username:
+                user = User.query.filter_by(name=get_username).first()
+                words = NewWords.query.filter_by(person_id=user.id).all()
+                get_words = '\n'.join(str(word) for word in words)
+                bot.send_message(chat_id, f"Your list of words:\n{get_words}")
+            else:
+                bot.send_message(chat_id, "Sorry, i don't know who you are..")      
         else:
             add_words_to_vocab(text, unique_code)
             msg = bot.send_message(chat_id, next(answers, "One more!"))
@@ -131,23 +137,6 @@ def gather_words(message, unique_code):
         print(str(e))
         bot.send_message(chat_id, "Ops, words havent been added..")
 
-
-def get_user_words(message, unique_code):
-    try:
-        chat_id = message.from_user.id
-        get_username = get_username_from_db(unique_code)
-        if get_username:
-            print("get user words name", get_username)
-            user = User.query.filter_by(name=get_username).first()
-            words = NewWords.query.filter_by(person_id=user.id).all()
-            print("get user words words", words)
-            bot.send_message(chat_id, f"Your list of words: {words}")
-        else:
-            bot.send_message(chat_id, "Sorry, i cannot give you words")
-    except Exception as e:
-        print(str(e))
-        bot.send_message(chat_id, "There is an error..")
-    
 
 def process_test(message):
     try:
