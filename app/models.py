@@ -49,8 +49,8 @@ class NewWords(db.Model):
     user_word = db.Column(db.String(30))
     person_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __repr__(self):
-        return f"Words('{self.user_word}')"
+    def __str__(self):
+        return f"{self.user_word}"
 
 
 class TbotChatId(db.Model):
@@ -61,4 +61,4 @@ class TbotChatId(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     
     def __repr__(self):
-        return f"TbotChatId('{self.user_chat_id}')"
+        return f"{self.user_chat_id}"
