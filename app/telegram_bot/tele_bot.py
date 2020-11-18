@@ -43,11 +43,11 @@ def send_welcome(message):
     unique_code = ProcessWelcome.extract_unique_code(message.text)
     chat_id = message.from_user.id
     if unique_code:
-        get_username = ProcessWelcome.get_username_from_db(unique_code)
-        if get_username:
+        send_welcome.get_username = ProcessWelcome.get_username_from_db(unique_code)
+        if send_welcome.get_username:
             ProcessWelcome.save_chat_id(chat_id, unique_code)
             reply = "Hello {0}! {1} Let's add some new words into your vocabulary! Just type in any word".format(
-                get_username,
+                send_welcome.get_username,
                 greeting
             )
             mes = bot.send_message(chat_id, reply)
@@ -58,11 +58,6 @@ def send_welcome(message):
     else:
         mistake = "Sorry, but i accept messages from registered users only.."
         bot.send_message(chat_id, mistake)
-
-
-# @bot.message_handler(func=lambda message: True, content_types=['text'])
-# def command_default(m):
-#     bot.send_message(m.chat.id, "I don't understand \"" + m.text + "\"\nMaybe try the /help command?")
 
 
 @bot.message_handler(commands=["addwords"])
@@ -109,3 +104,24 @@ def gather_words(message, unique_code: str):
     except Exception as e:
         print(str(e))
         bot.send_message(chat_id, "Ops, words havent been added..")
+
+
+@bot.message_handler(func=lambda message: True, content_types=['text'])
+def my_words(message):
+    try:
+        text = message.text
+        if text == "/mywords":
+            chat_id = message.from_user.id
+            username = send_welcome.get_username
+            if username:
+                user = User.query.filter_by(name=username).first()
+                words = NewWords.query.filter_by(person_id=user.id).all()
+                get_words = '\n'.join(str(word) for word in words)
+                bot.send_message(chat_id, f"Your list of words:\n{get_words}")
+            else:
+                bot.send_message(chat_id, "Sorry, i have no clue who you are")
+        else:
+            bot.send_message(chat_id, "I don't understand:( Maybe try /help command?")
+    except Exception as e:
+        print(str(e))
+        bot.send_message(chat_id, "Ooooppppss..")
