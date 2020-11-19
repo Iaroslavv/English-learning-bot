@@ -5,8 +5,7 @@ from app.users.routes import find_user_by_access_link
 
 class ProcessWelcome:
     """Save user chat > username to db."""
-    # get the hash code from the link on the website where /start=user's hashcode
-    # generated from his username
+
     @staticmethod
     def extract_unique_code(text: str) -> str:
         return text.split()[1] if len(text.split()) > 1 else None

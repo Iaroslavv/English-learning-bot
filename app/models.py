@@ -18,12 +18,13 @@ class User(db.Model, UserMixin):
     img_file = db.Column(db.String(20), nullable=False, default="static/default.png")
     password = db.Column(db.String(60), nullable=False)
     access_link = db.Column(db.String(70), nullable=False)
-    new_user_words = db.relationship("NewWords", backref="person", lazy=True)
-    user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
     instagram = db.Column(db.String(30), nullable=False, default="Your instagram")
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
+
+    new_user_words = db.relationship("NewWords", backref="person", lazy=True)
+    user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
 
     def get_reset_token(self, expires_sec=1800):
         serial = Serializer(current_app.config["SECRET_KEY"], expires_sec)
@@ -49,8 +50,19 @@ class NewWords(db.Model):
     user_word = db.Column(db.String(30))
     person_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __str__(self):
+    def __repr__(self):
         return self.user_word
+
+
+class Synonyms(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    word_id = db.Column(db.Integer, db.ForeignKey("newwords.id"))
+    synonym = db.Column(db.String())
+    synonyms = db.relationship("NewWords", backref="newwords", lazy=True)
+
+    def __repr__(self):
+        return self.synonym
 
 
 class TbotChatId(db.Model):
