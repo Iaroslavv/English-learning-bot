@@ -90,9 +90,6 @@ def gather_words(message, unique_code: str):
             if get_username:
                 user = User.query.filter_by(name=get_username).first()
                 words = NewWords.query.filter_by(person_id=user.id).all()
-                user_dict = {}
-                for word in words:
-                    user_dict[word] = find_synonym(word)
                 get_words = '\n'.join(str(word) for word in words)
                 bot.send_message(chat_id, f"Your list of words:\n{get_words}")
             else:
