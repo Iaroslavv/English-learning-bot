@@ -40,15 +40,21 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
     
     def __repr__(self):
-        return f"User('{self.name}', '{self.email}', '{self.user_chat}', '{self.new_user_words}')"
+        return "User: {name}, {chat}, {new_user_words}".format(name=self.name,
+                                                               chat=self.user_chat,
+                                                               new_user_words=self.new_user_words)
 
 
 class NewWords(db.Model):
     """User's words db model."""
+    
+    __tablename__ = "newwords"
 
     id = db.Column(db.Integer, primary_key=True)
     user_word = db.Column(db.String(30))
     person_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
+    synonyms = db.relationship("Synonyms", backref="person_words", lazy=True)
 
     def __repr__(self):
         return self.user_word
@@ -57,9 +63,8 @@ class NewWords(db.Model):
 class Synonyms(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
+    synonym = db.Column(db.String(20))
     word_id = db.Column(db.Integer, db.ForeignKey("newwords.id"))
-    synonym = db.Column(db.String())
-    synonyms = db.relationship("NewWords", backref="newwords", lazy=True)
 
     def __repr__(self):
         return self.synonym
