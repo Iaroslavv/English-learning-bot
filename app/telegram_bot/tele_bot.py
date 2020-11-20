@@ -5,6 +5,7 @@ from app import db
 from app.models import User, NewWords
 from app.telegram_bot.process_user_welcome import ProcessWelcome
 from app.telegram_bot.synonyms import find_synonym
+import random
 
 
 bot = telebot.TeleBot(TOKEN)
@@ -40,18 +41,18 @@ def webhook():
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
-    unique_code = ProcessWelcome.extract_unique_code(message.text)
+    send_welcome.unique_code = ProcessWelcome.extract_unique_code(message.text)
     chat_id = message.from_user.id
-    if unique_code:
-        send_welcome.get_username = ProcessWelcome.get_username_from_db(unique_code)
+    if send_welcome.unique_code:
+        send_welcome.get_username = ProcessWelcome.get_username_from_db(send_welcome.unique_code)
         if send_welcome.get_username:
-            ProcessWelcome.save_chat_id(chat_id, unique_code)
+            ProcessWelcome.save_chat_id(chat_id, send_welcome.unique_code)
             reply = "Hello {0}! {1} Let's add some new words into your vocabulary! Just type in any word".format(
                 send_welcome.get_username,
                 greeting
             )
             mes = bot.send_message(chat_id, reply)
-            bot.register_next_step_handler(mes, gather_words, unique_code)
+            bot.register_next_step_handler(mes, gather_words, send_welcome.unique_code)
         else:
             no_id = "I have no clue who you are"
             bot.send_message(chat_id, no_id)
@@ -63,9 +64,10 @@ def send_welcome(message):
 @bot.message_handler(commands=["addwords"])
 def add_words(message):
     chat_id = message.from_user.id
+    unique_code = send_welcome.unique_code
     msg = bot.send_message(chat_id,
     "Type in the word you want to add. Type in 'finish' to stop adding words and see the synonyms.")
-    bot.register_next_step_handler(msg, gather_words)
+    bot.register_next_step_handler(msg, gather_words, unique_code)
 
 
 def add_words_to_vocab(word: str, unique_code: str):
@@ -107,8 +109,8 @@ def gather_words(message, unique_code: str):
 def my_words(message):
     try:
         text = message.text
+        chat_id = message.from_user.id
         if text == "/mywords":
-            chat_id = message.from_user.id
             username = send_welcome.get_username
             if username:
                 user = User.query.filter_by(name=username).first()
@@ -116,9 +118,46 @@ def my_words(message):
                 get_words = '\n'.join(str(word) for word in words)
                 bot.send_message(chat_id, f"Your list of words:\n{get_words}")
             else:
-                bot.send_message(chat_id, "Sorry, i have no clue who you are")
+                bot.send_message(chat_id, "Sorry, i have no clue who you are") 
+        if text == "/study":
+            username = send_welcome.get_username
+            if username:
+                user = User.query.filter_by(name=username).first()
+                words = NewWords.query.filter_by(person_id=user.id).all()
+                choice = random.choice(words)
+                msg = bot.send_message(chat_id, choice)
+                bot.register_next_step_handler(msg, guess, choice)
+            else:
+                bot.send_message(chat_id, "Sorry, i have no clue who you are") 
         else:
             bot.send_message(chat_id, "I don't understand:( Maybe try /help command?")
     except Exception as e:
         print(str(e))
         bot.send_message(chat_id, "Ooooppppss..")
+
+
+def guess(message, word):
+    try:
+        chat_id = message.from_user.id
+        text = message.text
+        synonyms = find_synonym(word)
+        username = send_welcome.get_username
+        if username:
+            print(f"syns for {word}", synonyms)
+            user = User.query.filter_by(name=username).first()
+            words = NewWords.query.filter_by(person_id=user.id).all()
+            if text.lower() in synonyms:
+                print("correct")
+                choice = random.choice(words)
+                msg = bot.send_message(chat_id, f"Correct! The next word is:\n {choice}", choice)
+                bot.register_next_step_handler(msg, guess, choice)
+            if text.lower() not in synonyms:
+                print("incorrect!")
+                choice = random.choice(words)
+                msg = bot.send_message(chat_id, f"Incorrect! The next word is:\n{choice}", choice)
+                bot.register_next_step_handler(msg, guess, choice)
+        else:
+            bot.send_message(chat_id, "Sorry, i have no clue who you are..")
+    except Exception as e:
+        print(str(e))
+        bot.send_message(chat_id, "Ooooppss")
