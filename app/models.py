@@ -22,7 +22,7 @@ class User(db.Model, UserMixin):
     facebook = db.Column(db.String(30), nullable=False, default="Your facebook")
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
-
+    user_points = db.Column(db.Integer, default=0)
     new_user_words = db.relationship("NewWords", backref="person", lazy=True)
     user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
 
@@ -39,6 +39,9 @@ class User(db.Model, UserMixin):
             return None
         return User.query.get(user_id)
 
+    def __repr__(self):
+        return f"User: {self.name}, {self.user_points}, {self.new_user_words}"
+
 
 class NewWords(db.Model):
     """User's words db model."""
@@ -51,8 +54,8 @@ class NewWords(db.Model):
 
     def __repr__(self):
         return self.user_word
-
-
+    
+  
 class TbotChatId(db.Model):
     """User's telegram chat id model."""
 
