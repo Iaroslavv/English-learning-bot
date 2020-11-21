@@ -6,10 +6,12 @@ from app.models import User, NewWords
 from app.telegram_bot.process_user_welcome import ProcessWelcome
 from app.telegram_bot.synonyms import find_synonym
 import random
+from app.telegram_bot.count_poinst import UserPoints
 
 
 bot = telebot.TeleBot(TOKEN)
 web = Blueprint("Web", __name__)
+points = UserPoints()
 
 commands = (
 """
