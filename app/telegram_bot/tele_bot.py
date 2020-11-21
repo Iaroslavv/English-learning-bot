@@ -6,7 +6,7 @@ from app.models import User, NewWords
 from app.telegram_bot.process_user_welcome import ProcessWelcome
 from app.telegram_bot.synonyms import find_synonym
 import random
-from app.telegram_bot.count_poinst import UserPoints
+from app.telegram_bot.count_points import UserPoints
 
 
 bot = telebot.TeleBot(TOKEN)
@@ -112,7 +112,10 @@ def myscore(message):
         if username:
             user = User.query.filter_by(name=username).first()
             total = user.user_points
-            bot.send_message(chat_id, f"Your score is {total}")
+            if total > 0:
+                bot.send_message(chat_id, f"Your score is {total}")
+            else:
+                bot.send_message(chat_id, "Do studying to get the score! /study")
         else:
             bot.send_message(chat_id, "I have no clue who you are..")
     except Exception as e:
@@ -184,9 +187,7 @@ def guess(message, word):
                 if text.lower() in synonyms:
                     points = UserPoints()
                     points.add_point(1)
-                    print("if correct + 1 point")
                     total = points.show_points
-                    print("total", total)
                     user.user_points = total
                     db.session.commit()
                     print("committed")
