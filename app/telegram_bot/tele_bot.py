@@ -185,18 +185,13 @@ def guess(message, word):
                 user = User.query.filter_by(name=username).first()
                 words = NewWords.query.filter_by(person_id=user.id).all()
                 if text.lower() in synonyms:
-                    points = UserPoints()
-                    points.add_point(1)
-                    total = points.show_points
-                    user.user_points = total
+                    setattr(user, "user_points", user.user_points + 1)
                     db.session.commit()
-                    print("committed")
                     choice = random.choice(words)
                     msg = bot.send_message(chat_id, f"Correct! The next word is:\n {choice}",
                                            choice)
                     bot.register_next_step_handler(msg, guess, choice)
                 if text.lower() not in synonyms:
-                    print("incorrect!")
                     choice = random.choice(words)
                     msg = bot.send_message(chat_id, f"Incorrect! The next word is:\n{choice}",
                                            choice)
