@@ -151,25 +151,25 @@
                     </form>
                     </div>
                   </div>
-                  <div class="row gutters-sm">
-                    <div class="col-sm-6 mb-3">
+                  <div class="row">
+                    <div class="col-md-12">
                       <div class="card h-100">
                         <div class="card-body">
-                          <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Status</i>Completed</h6>
-                          <small>Web Design</small>
-                          <div class="progress mb-3" style="height: 5px">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                          <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Status:</i>Synonyms completed</h6>
+                          <small>Till next level</small>
+                          <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width:{{ current_user.user_points }};" aria-valuenow="25" aria-valuemin="0" aria-valuemax="300">{{ current_user.user_points }} </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-sm-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Status</i>Words to learn</h6>
-                          <small>Web Design</small>
-                          <div class="progress mb-3" style="height: 5px">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                          <hr>
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <h6 class="mb-0">Practised words</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                              {% for word in current_user.new_user_words %}
+                              <a> {{ word }} </a>
+                              {% endfor %}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -181,6 +181,17 @@
         </div>
   
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+   integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I="
+   crossorigin="anonymous">
+  </script>
+<script type="text/javascript" charset="utf-8">
+
+var socket = io.connect('http://127.0.0.1:8443');
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'Client connected!'});
+        });
+</script>
     <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
       integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
