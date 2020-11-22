@@ -74,11 +74,15 @@ def login():
 def account():
     image_file = current_user.img_file
     access_to_telebot = current_user.access_link
+    words = current_user.new_user_words
+    counts = current_user.user_points
     return render_template(
         "account.html",
         title="Account",
         image_file=image_file,
         access_to_telebot=access_to_telebot,
+        words=words,
+        counts=counts,
         )
 
 
