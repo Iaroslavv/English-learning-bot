@@ -78,10 +78,10 @@ class UpdateAccountForm(FlaskForm):
                 raise ValidationError("The user with this email already exists!")
 
 
-class ButtonField(BooleanField):
-    widget = Input(input_type="Button")
-
-
-class ListWords(FlaskForm):
+class AddWords(FlaskForm):
     words = StringField(validators=[DataRequired()])
-    submit = ButtonField("Show")
+    submit = SubmitField("Save changes")
+
+    def check_words(self, words):
+        if words.data in current_user.new_user_words:
+            raise ValidationError("You have already added this word!")
