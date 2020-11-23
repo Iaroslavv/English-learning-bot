@@ -7,8 +7,9 @@ from app.users.forms import (
     RequestResetForm,
     ResetPasswordForm,
     UpdateAccountForm,
+    AddWords,
 )
-from app.models import User
+from app.models import User, NewWords
 from flask_login import login_user, login_required, current_user, logout_user
 from app.users.utils import send_reset_email
 from hashlib import sha256
@@ -24,6 +25,9 @@ def generate_access_link(name: str) -> str:
 def find_user_by_access_link(access_link: str) -> str:
     return User.query.filter_by(access_link=access_link).first()
 
+@users.route("/", methods=["GET", "POST"])
+def index():
+    return render_template("index.html")
 
 @users.route("/main", methods=["GET", "POST"])
 def main():
@@ -75,14 +79,25 @@ def account():
     image_file = current_user.img_file
     access_to_telebot = current_user.access_link
     words = current_user.new_user_words
-    counts = current_user.user_points
+    points = (current_user.user_points / 300) * 100
+    current_user.user_points = round(points, 1)
+    form = AddWords()
+    if form.validate_on_submit:
+        if form.words.data:
+            print("word to db")
+            word_to_db = NewWords(user_word=form.words.data)
+            db.session.add(word_to_db)
+            print("added")
+            words.append(word_to_db)
+            db.session.commit()
+            return redirect(url_for("users.account"))
     return render_template(
         "account.html",
+        form=form,
         title="Account",
         image_file=image_file,
         access_to_telebot=access_to_telebot,
         words=words,
-        counts=counts,
         )
 
 
