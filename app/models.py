@@ -23,6 +23,8 @@ class User(db.Model, UserMixin):
     twitter = db.Column(db.String(30), nullable=False, default="Your twitter")
     telegram_info = db.Column(db.String(30), nullable=False, default="@Yourtelegram")
     user_points = db.Column(db.Integer, default=0)
+    nickname = db.Column(db.Integer, default="Noob")
+
     new_user_words = db.relationship("NewWords", backref="person", lazy=True)
     user_chat = db.relationship("TbotChatId", uselist=False, lazy=True, backref="user")
 
