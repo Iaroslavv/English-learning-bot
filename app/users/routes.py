@@ -84,10 +84,8 @@ def account():
     form = AddWords()
     if form.validate_on_submit:
         if form.words.data:
-            print("word to db")
             word_to_db = NewWords(user_word=form.words.data)
             db.session.add(word_to_db)
-            print("added")
             words.append(word_to_db)
             db.session.commit()
             return redirect(url_for("users.account"))
@@ -166,4 +164,13 @@ def reset_token(token):
 @users.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    pass
+    users = User.query.order_by(User.user_points.desc()).all()
+    quantity = User.query.order_by(User.user_points.desc()).count()
+    headings = ("Position", "Name", "Level", "Score")
+    title = "dashboard"
+    return render_template("dashboard.html",
+                           users=users,
+                           title=title,
+                           headings=headings,
+                           quantity=quantity,
+                           )

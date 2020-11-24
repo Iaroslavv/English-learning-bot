@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <div class="main-body">
+<div class="table-responsive-sm">
+    <div class="row">
+        <table class="table">
+            <thead class="thead-dark">
+              <tr id="rows">
+                {% for header in headings %}
+                <th scope="col">{{header }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody style="background-color: rgb(238, 238, 236);">
+                {% for user in users %}
+                <tr>
+                    <td> {{ loop.index }} </td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.nickname }}</td>
+                    <td>{{ user.user_points }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+{% endblock content %}
+<!-- <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        {% for header in headings %}
+        <th scope="col">{{header }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+        {% for pos in range(1, quantity + 1) %}
+        <tr>
+            <td>{{ pos }}</td>
+        </tr>
+        {% endfor %}
+        {% for user in users %}
+        <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.nickname }}</td>
+            <td>{{ user.user_points }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table> -->

@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
         return User.query.get(user_id)
 
     def __repr__(self):
-        return f"User: {self.name}, {self.user_points}, {self.new_user_words}"
+        return f"{self.name}, {self.user_points}, {self.new_user_words}"
 
 
 class NewWords(db.Model):
