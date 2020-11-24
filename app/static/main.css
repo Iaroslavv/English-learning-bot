@@ -84,6 +84,12 @@ nav .navbar-nav li a:hover {
     margin-top: 20px;
 }
 
+tr {
+  line-height: 25px;
+  min-height: 25px;
+  height: 25px;
+}
+
 @media (max-width: 576px) {
   .registration-form form{
       padding: 50px 20px;
@@ -122,11 +128,6 @@ body{
   border-radius: .25rem;
 }
 
-/* #alert {
-  margin-bottom: 1px;
-  height: 10px;
-  padding: 0px;
-} */
 .card-body {
   flex: 1 1 auto;
   /* min-height: 1px; */

@@ -6,13 +6,13 @@
     <div class="row">
         <table class="table">
             <thead class="thead-dark">
-              <tr>
+              <tr id="rows">
                 {% for header in headings %}
                 <th scope="col">{{header }}</th>
                 {% endfor %}
               </tr>
             </thead>
-            <tbody>
+            <tbody style="background-color: rgb(238, 238, 236);">
                 {% for user in users %}
                 <tr>
                     <td> {{ loop.index }} </td>
