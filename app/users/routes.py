@@ -175,5 +175,5 @@ def dashboard():
 @login_required
 def profile(username):
     user = User.query.filter_by(name=username).first_or_404()
-    image_file = user.get(img_file)
+    image_file = user.img_file
     return render_template("profile.html", user=user, image_file=image_file)
