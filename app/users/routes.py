@@ -25,9 +25,6 @@ def generate_access_link(name: str) -> str:
 def find_user_by_access_link(access_link: str) -> str:
     return User.query.filter_by(access_link=access_link).first()
 
-@users.route("/", methods=["GET", "POST"])
-def index():
-    return render_template("index.html")
 
 @users.route("/main", methods=["GET", "POST"])
 def main():
@@ -165,12 +162,18 @@ def reset_token(token):
 @login_required
 def dashboard():
     users = User.query.order_by(User.user_points.desc()).all()
-    quantity = User.query.order_by(User.user_points.desc()).count()
     headings = ("Position", "Name", "Level", "Score")
     title = "dashboard"
     return render_template("dashboard.html",
                            users=users,
                            title=title,
                            headings=headings,
-                           quantity=quantity,
                            )
+
+
+@users.route("/user/<username>", methods=["GET"])
+@login_required
+def profile(username):
+    user = User.query.filter_by(name=username).first_or_404()
+    image_file = user.get(img_file)
+    return render_template("profile.html", user=user, image_file=image_file)
