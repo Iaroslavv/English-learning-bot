@@ -21,6 +21,8 @@ app.template_folder = "templates"
 
 from app import models
 from app.users.routes import users
+from app.handlers.error_handlers import errors
 from app.telegram_bot.tele_bot import web
 app.register_blueprint(users)
 app.register_blueprint(web)
+app.register_blueprint(errors)
