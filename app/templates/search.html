@@ -16,7 +16,7 @@
                     {% for hit in res['hits']['hits'] %}
                     <tr>
                         <td>
-                           <a href="{{ url_for('users.profile', username={{ hit['_source']['name'] }}) }}">{{ hit['_source']['name'] }}</a>
+                           <a href="{{ url_for('users.profile') }}">{{ hit['_source']['name'] }}</a>
                         </td>
                     </tr>
                     {% endfor %}
