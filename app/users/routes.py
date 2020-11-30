@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app import db, bcrypt
+from app import db, bcrypt, es
 from flask import render_template, flash, redirect, url_for, request
 from app.users.forms import (
     SignUpForm,
@@ -8,11 +8,13 @@ from app.users.forms import (
     ResetPasswordForm,
     UpdateAccountForm,
     AddWords,
+    SearchForm,
 )
 from app.models import User, NewWords
 from flask_login import login_user, login_required, current_user, logout_user
 from app.users.utils import send_reset_email
 from hashlib import sha256
+import json
 
 
 users = Blueprint("users", __name__)
@@ -48,6 +50,14 @@ def signup():
         db.session.add(user)
         db.session.commit()
 
+        _name = user.name
+        esdata = json.dumps(
+            {
+                "name": _name,
+            }
+        )
+        es.index(index="names", doc_type="names", body=esdata)
+        print("index added!")
         flash("Your account has been successfully created!", "success")    # not working
         return redirect(url_for("users.login"))
   
@@ -177,3 +187,29 @@ def profile(username):
     user = User.query.filter_by(name=username).first_or_404()
     image_file = user.img_file
     return render_template("profile.html", user=user, image_file=image_file)
+
+
+@users.route("/search/", methods=["GET", "POST"])
+@login_required
+def search():
+    print("search beginning")
+    form = SearchForm()
+    q = request.args.get("q")
+    print("request: ", q)
+   
+    if form.validate():
+        print("SEARCH FUNCTION")
+        body = {
+                    "query": {
+                        "multi-match": {
+                            "query": q,
+                            "fields": ["name"]
+                        }
+                    }
+                }
+        print("before res")
+        res = es.search(index="names", doc_type="names", size=5, body=body)
+        print("res", res)
+        return render_template("search.html", res=res)
+    else:
+        print("Oops")

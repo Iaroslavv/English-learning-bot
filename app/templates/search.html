@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1> Search results </h1>
+    <div class="container">
+        <div class="main-body">
+    <div class="table-responsive-sm">
+        <div class="row">
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr id="rows">
+                    <th scope="col">Name</th>
+                  </tr>
+                </thead>
+                <tbody style="background-color: rgb(238, 238, 236);">
+                    {% for hit in res['hits']['hits'] %}
+                    <tr>
+                        <td>
+                           <a href="{{ url_for('users.profile') }}">{{ hit['_source']['name'] }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+    </div>
+    </div>
+
+{% endblock content %}
