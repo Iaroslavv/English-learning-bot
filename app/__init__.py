@@ -4,10 +4,12 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_elasticsearch import FlaskElasticsearch
 
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object("config.config")
+es = FlaskElasticsearch(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
 bcrypt = Bcrypt(app)
