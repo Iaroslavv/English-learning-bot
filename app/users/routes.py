@@ -8,7 +8,6 @@ from app.users.forms import (
     ResetPasswordForm,
     UpdateAccountForm,
     AddWords,
-    SearchForm,
 )
 from app.models import User, NewWords
 from flask_login import login_user, login_required, current_user, logout_user
@@ -166,7 +165,7 @@ def reset_token(token):
   
     image_file = current_user.img_file
     return render_template("account.html", title="Account", image_file=image_file)
-    
+
 
 @users.route("/dashboard", methods=["GET", "POST"])
 @login_required
@@ -192,24 +191,19 @@ def profile(username):
 @users.route("/search/", methods=["GET", "POST"])
 @login_required
 def search():
-    print("search beginning")
-    form = SearchForm()
     q = request.args.get("q")
-    print("request: ", q)
-   
-    if form.validate():
-        print("SEARCH FUNCTION")
+    if q is not None:
         body = {
-                    "query": {
-                        "multi-match": {
-                            "query": q,
-                            "fields": ["name"]
-                        }
+                "query": {
+                    "multi_match": {
+                        "query": q,
+                        "type": "phrase_prefix",
+                        "fields": ["name"]
                     }
                 }
-        print("before res")
+            }
         res = es.search(index="names", doc_type="names", size=5, body=body)
         print("res", res)
         return render_template("search.html", res=res)
     else:
-        print("Oops")
+        return render_template("404.html")
