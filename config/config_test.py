@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 CSRF_ENABLED = False
 SECRET_KEY = 'gh3y4hgy48hghidbsla43gb'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
