@@ -22,6 +22,7 @@ app.static_folder = "static"
 app.template_folder = "templates"
 
 from app import models
+from app.tests import test_users
 from app.users.routes import users
 from app.handlers.error_handlers import errors
 from app.telegram_bot.tele_bot import web
