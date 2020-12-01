@@ -7,14 +7,18 @@ chardet==3.0.4
 click==7.1.2
 colorama==0.4.4
 ConfigArgParse==1.2.3
+dnspython==1.16.0
+elasticsearch==7.10.0
 flake8==3.8.4
 Flask==1.1.2
 Flask-Bcrypt==0.7.1
+Flask-Elasticsearch==0.2.5
 Flask-Login==0.5.0
 Flask-Mail==0.9.1
 Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.4
 Flask-WTF==0.14.3
+greenlet==0.4.17
 idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.2
@@ -36,5 +40,3 @@ tqdm==4.51.0
 urllib3==1.25.11
 Werkzeug==1.0.1
 WTForms==2.3.3
-
-
