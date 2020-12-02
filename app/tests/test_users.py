@@ -1,5 +1,7 @@
 from app import app, db, mail
 import unittest
+from unittest.mock import patch
+from app.telegram_bot.synonyms import find_synonym
 
 
 class TestUsers(unittest.TestCase):
@@ -12,7 +14,7 @@ class TestUsers(unittest.TestCase):
 
         mail.init_app(app)
         self.assertEqual(app.debug, False)
-        
+     
     def tearDown(self):
         db.session.remove()
         db.drop_all()
@@ -40,6 +42,17 @@ class TestUsers(unittest.TestCase):
     
     def test_logout(self):
         self.assertEqual(self.logout().status_code, 200)
+
+    def test_rapidapi_query(self):
+        with patch("requests.get") as mocked_get:
+            url = "https://wordsapiv1.p.rapidapi.com/words/hello/synonyms"
+            mocked_get.return_value.status_code = 200
+            mocked_get.return_value.ok = True
+            mocked_get.return_value = ['hi', 'how-do-you-do', 'howdy', 'hullo']
+            synonym = find_synonym("hello")
+
+            self.assertTrue(find_synonym(url))
+            self.assertEqual(synonym, ['hi', 'how-do-you-do', 'howdy', 'hullo'])
 
 
 if __name__ == "__main__":

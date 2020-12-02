@@ -1,2 +1,2 @@
 #unittests
-##python -m unittest app/tests/test_users.py 
+##python -m unittest -v app/tests/test_users.py 
