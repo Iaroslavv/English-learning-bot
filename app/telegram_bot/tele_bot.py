@@ -32,6 +32,8 @@ greeting = f"Welcome to 'StudyEnglish with Bot'! {commands}"
 #  set webhook for telegram bot
 @web.route("/setweb", methods=["POST"])
 def webhook():
+    """Sets a webhook."""
+
     if request.headers.get("content-type") == "application/json":
         json_string = request.get_data().decode("utf-8")
         update = telebot.types.Update.de_json(json_string)
@@ -43,6 +45,8 @@ def webhook():
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    """Sends welcome message to the registered user."""
+
     send_welcome.unique_code = ProcessWelcome.extract_unique_code(message.text)
     chat_id = message.from_user.id
     if send_welcome.unique_code:
@@ -65,6 +69,8 @@ def send_welcome(message):
 
 @bot.message_handler(commands=["addwords"])
 def add_words(message):
+    """Adds user words to the db."""
+
     chat_id = message.from_user.id
     unique_code = send_welcome.unique_code
     msg = bot.send_message(chat_id,
@@ -74,6 +80,8 @@ def add_words(message):
 
 @bot.message_handler(commands=["study"])
 def study(message):
+    """Activates studying mode."""
+
     chat_id = message.from_user.id
     username = send_welcome.get_username
     if username:
@@ -88,6 +96,8 @@ def study(message):
 
 @bot.message_handler(commands=["mywords"])
 def mywords(message):
+    """Get a list of added words."""
+
     try:
         chat_id = message.from_user.id
         username = send_welcome.get_username
@@ -105,6 +115,8 @@ def mywords(message):
 
 @bot.message_handler(commands=["myscore"])
 def myscore(message):
+    """Counts user points and shows the total."""
+
     try:
         chat_id = message.from_user.id
         username = send_welcome.get_username
@@ -123,6 +135,8 @@ def myscore(message):
 
 
 def add_words_to_vocab(word: str, unique_code: str):
+    """Adds words to specific user."""
+
     get_username = ProcessWelcome.get_username_from_db(unique_code)
     if get_username:
         user = User.query.filter_by(name=get_username).first()
@@ -136,6 +150,8 @@ answers = iter(["Come ooon", "Moooore words!", "One more!", "Don't be weak!", "O
 
 
 def gather_words(message, unique_code: str):
+    """Sends a list of words to the user."""
+
     try:
         chat_id = message.from_user.id
         text = message.text
@@ -159,6 +175,8 @@ def gather_words(message, unique_code: str):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def other_text(message):
+    """Replies with a message to the unknown command."""
+
     try:
         chat_id = message.from_user.id
         username = send_welcome.get_username
@@ -172,6 +190,8 @@ def other_text(message):
 
 
 def guess(message, word):
+    """Activates synonyms."""
+
     try:
         chat_id = message.from_user.id
         text = message.text
