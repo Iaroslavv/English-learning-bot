@@ -14,9 +14,12 @@ def find_synonym(*args):
                 }
 
             response = req.request("GET", url, headers=headers)
-            get_response = response.text
-            answer = json.loads(get_response)
-            final_answer = answer["synonyms"]
+            if response.ok:
+                get_response = response.text
+                answer = json.loads(get_response)
+                final_answer = answer["synonyms"]
+            else:
+                return "Bad response"
         return final_answer
     except Exception as e:
         return str(e)
