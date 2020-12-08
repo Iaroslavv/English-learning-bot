@@ -56,7 +56,6 @@ def signup():
             }
         )
         es.index(index="names", doc_type="names", body=esdata)
-        print("index added!")
         flash("Your account has been successfully created!", "success")    # not working
         return redirect(url_for("users.login"))
   
