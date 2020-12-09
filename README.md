@@ -10,7 +10,7 @@ The results are displayed in telegram bot as well as on your account page.
 
 ```bash
 git clone https://github.com/Iaroslavv/English-learning-bot.git
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 ## Running tests
 
